@@ -1,0 +1,11 @@
+.store-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 12px;
+}
+
+.store-card h3 {
+    margin-top: 0;
+    font-size: 20px;
+}
