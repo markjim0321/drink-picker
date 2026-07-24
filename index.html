@@ -16,8 +16,17 @@
   <main>
     <h1>附近飲料店隨機選店助手</h1>
     <p>不知道喝哪一家？讓我幫你選。</p>
-    <button id="store-all-btn">所有飲料店</button>
-    <button id="store-open-btn">營業中</button>
+
+    <select id="distance-filter">
+        <option value="500">500 公尺內</option>
+        <option value="1000">1 公里內</option>
+        <option value="2000">2 公里內</option>
+    </select>
+
+    <button id="store-random-btn">隨機選擇</button>
+
+    <div id="random-result"></div>
+
     <div id="store-count"></div>
 
     <div id="store-list" class="store-card">
