@@ -42,13 +42,14 @@ console.table(drinkStores);
 // 取得 HTML 元素
 // ======================
 
-
+// 飲料店數量
 const storeCount = document.getElementById("store-count");
-
-
 // 顯示飲料店列表
 const storeList = document.getElementById("store-list");
-//console.log(storeList);
+// 全部店家按鈕
+const storeAllBtn = document.getElementById("store-all-btn");
+// 營業中按鈕
+const storeOpenBtn = document.getElementById("store-open-btn");
 
 // ======================
 // function
@@ -60,13 +61,16 @@ function renderStores(stores) {
 let html = "";
     for (let i = 0; i < stores.length; i++) {
         const store = stores[i]; 
+
         html += `
-        <div class="store-card">
-            <h3>${store.name}</h3>
-            <p>評分: ${store.rating}</p>
-            <p>${store.isOpen ? "🟢 營業中" : "🔴 已打烊"}</p>
-        </div>`; 
+            <div class="store-card">
+                <h3>${store.name}</h3>
+                <p>評分: ${store.rating}</p>
+                <p>${store.isOpen ? "🟢 營業中" : "🔴 已打烊"}</p>
+            </div>
+        `; 
     }
+
     storeList.innerHTML = html; 
 
 }
@@ -84,3 +88,14 @@ renderStoreCount(drinkStores);
 
 // 顯示飲料店
 renderStores(drinkStores);
+
+storeAllBtn.addEventListener("click", function () {
+    renderStoreCount(drinkStores);
+    renderStores(drinkStores);
+});
+
+storeOpenBtn.addEventListener("click", function () {
+    const openStores = drinkStores.filter(store => store.isOpen);
+    renderStoreCount(openStores);
+    renderStores(openStores);
+});
