@@ -3,92 +3,104 @@
 // ======================
 
 const drinkStores = [
-  {
-    name: "珍珠茶坊",
-    latitude: 25.085,
-    longitude: 121.470,
-    rating: 4.5,
-    isOpen: true,
-    distance: 200
-  },
-  {
-    name: "五十嵐",
-    latitude: 25.08,
-    longitude: 121.48,
-    rating: 4.2,
-    isOpen: true,
-    distance: 450
-  },
-  {
-    name: "茶湯會",
-    latitude: 25.075,
-    longitude: 121.460,
-    rating: 4.0,
-    isOpen: true,
-    distance: 800
-  },
-  {
-    name: "CoCo都可",
-    latitude: 25.070,
-    longitude: 121.455,
-    rating: 4.3,
-    isOpen: true,
-    distance: 1200
-  }
+    {
+        name: "珍珠茶坊",
+        latitude: 25.085,
+        longitude: 121.470,
+        rating: 4.5,
+        isOpen: true
+    },
+    {
+        name: "五十嵐",
+        latitude: 25.080,
+        longitude: 121.480,
+        rating: 4.2,
+        isOpen: true
+    },
+    {
+        name: "茶湯會",
+        latitude: 25.075,
+        longitude: 121.460,
+        rating: 4.0,
+        isOpen: true
+    },
+    {
+        name: "CoCo都可",
+        latitude: 25.070,
+        longitude: 121.455,
+        rating: 4.3,
+        isOpen: true
+    }
 ];
-
-// 在瀏覽器開發者工具中查看資料
-console.table(drinkStores);
-
 
 
 // ======================
 // 取得 HTML 元素
 // ======================
 
-// 飲料店數量
 const storeCount = document.getElementById("store-count");
-// 顯示飲料店列表
+
 const storeList = document.getElementById("store-list");
-// 隨機店家按鈕
-const storeRandomBtn = document.getElementById("store-random-btn");
-// 顯示隨機店家結果
-const randomResult = document.getElementById("random-result");
-// 距離篩選器
-const distanceFilter = document.getElementById("distance-filter");
+
+const storeRandomBtn =
+    document.getElementById("store-random-btn");
+
+const randomResult =
+    document.getElementById("random-result");
+
+const distanceFilter =
+    document.getElementById("distance-filter");
+
 
 // ======================
-// function
+// Functions
 // ======================
 
-// 顯示飲料店列表的function
+// 顯示飲料店列表
 function renderStores(stores) {
+    let html = "";
 
-let html = "";
     for (let i = 0; i < stores.length; i++) {
-        const store = stores[i]; 
+        const store = stores[i];
 
         html += `
             <div class="store-card">
                 <h3>${store.name}</h3>
-                <p>評分: ${store.rating}</p>
-                <p>距離: ${store.distance} 公尺</p>
-                <p>${store.isOpen ? "🟢 營業中" : "🔴 已打烊"}</p>
+                <p>⭐ 評分：${store.rating}</p>
+                <p>📍 距離：${formatDistance(store.distance)}</p>
+                <p>
+                    ${store.isOpen
+                        ? "🟢 營業中"
+                        : "🔴 已打烊"}
+                </p>
             </div>
-        `; 
+        `;
     }
 
-    storeList.innerHTML = html; 
+    if (stores.length === 0) {
+        html = `
+            <p>目前這個距離內沒有營業中的飲料店。</p>
+        `;
+    }
 
+    storeList.innerHTML = html;
 }
-// 顯示飲料店數量的function
+
+
+// 顯示飲料店數量
 function renderStoreCount(stores) {
-    storeCount.textContent = `目前共有 ${stores.length} 間飲料店`;
+    storeCount.textContent =
+        `目前共有 ${stores.length} 間飲料店`;
 }
-// 取得營業中的飲料店並排序的function
+
+
+// 取得營業中且符合距離的店家
 function getOpenStores(maxDistance) {
-    const openStores =
-        drinkStores.filter(store => store.isOpen && store.distance <= maxDistance);
+    const openStores = drinkStores.filter(
+        store =>
+            store.isOpen &&
+            store.distance <= maxDistance
+    );
 
     openStores.sort(
         (a, b) => a.distance - b.distance
@@ -96,59 +108,193 @@ function getOpenStores(maxDistance) {
 
     return openStores;
 }
-// 顯示隨機店家的function
+
+
+// 顯示隨機選中的店家
 function renderRandomStore(store) {
-    let html = "";
-    html += `
+    randomResult.innerHTML = `
         <div class="random-card">
             <h2>🎉 今天就喝這間！</h2>
             <h3>${store.name}</h3>
             <p>⭐ ${store.rating}</p>
-            <p>📍 ${store.distance} 公尺</p>
+            <p>📍 ${formatDistance(store.distance)}</p>
         </div>
-    `; 
-    randomResult.innerHTML = html; 
+    `;
 }
 
-   
 
-// ======================
-// 初始化畫面
-// ======================
-
-// 取得營業中的飲料店
-const openStores = getOpenStores(
-    Number(distanceFilter.value)
-);
-
-// 顯示營業中的飲料店數量
-renderStoreCount(openStores);
-
-// 顯示營業中的飲料店
-renderStores(openStores);
-
-// 隨機店家按鈕
-storeRandomBtn.addEventListener("click", function () {
-    const openStores = getOpenStores(
-    Number(distanceFilter.value)
-);
-    if (openStores.length === 0) {
-        // 如果沒有營業中的店家，顯示提示訊息
-        alert("目前沒有營業中的店家");
-        return; // 提前返回，避免後續程式碼執行
+// 格式化距離
+function formatDistance(distance) {
+    if (distance < 1000) {
+        return `${distance} 公尺`;
     }
-    const randomIndex = Math.floor(Math.random() * openStores.length);
-    const randomStore = openStores[randomIndex];
-    renderRandomStore(randomStore);    
-});
 
-// 距離篩選器
-distanceFilter.addEventListener("change", function () {
+    return `${(distance / 1000).toFixed(1)} 公里`;
+}
 
-    const openStores = getOpenStores(
-        Number(distanceFilter.value)
-    );
+
+// 取得使用者位置成功後執行
+function showPosition(position) {
+    const myLatitude =
+        position.coords.latitude;
+
+    const myLongitude =
+        position.coords.longitude;
+
+    for (let i = 0; i < drinkStores.length; i++) {
+        const store = drinkStores[i];
+
+        const distance = calculateDistance(
+            myLatitude,
+            myLongitude,
+            store.latitude,
+            store.longitude
+        );
+
+        store.distance =
+            Math.round(distance);
+    }
+
+    console.table(drinkStores);
+
+    updateStoreList();
+}
+
+
+// 取得位置失敗後執行
+function showPositionError(error) {
+    console.error("定位失敗：", error);
+
+    storeCount.textContent =
+        "無法取得你的位置";
+
+    storeList.innerHTML = `
+        <p>
+            請確認瀏覽器已允許位置權限，
+            然後重新整理網頁。
+        </p>
+    `;
+}
+
+
+// 計算兩個座標之間的距離
+function calculateDistance(
+    myLatitude,
+    myLongitude,
+    storeLatitude,
+    storeLongitude
+) {
+    const earthRadius = 6371000;
+
+    const latitudeDifference =
+        (storeLatitude - myLatitude) *
+        Math.PI / 180;
+
+    const longitudeDifference =
+        (storeLongitude - myLongitude) *
+        Math.PI / 180;
+
+    const a =
+        Math.sin(latitudeDifference / 2) ** 2 +
+        Math.cos(
+            myLatitude * Math.PI / 180
+        ) *
+        Math.cos(
+            storeLatitude * Math.PI / 180
+        ) *
+        Math.sin(
+            longitudeDifference / 2
+        ) ** 2;
+
+    const c =
+        2 * Math.atan2(
+            Math.sqrt(a),
+            Math.sqrt(1 - a)
+        );
+
+    return earthRadius * c;
+}
+
+
+// 依照目前篩選距離更新畫面
+function updateStoreList() {
+    const maxDistance =
+        Number(distanceFilter.value);
+
+    const openStores =
+        getOpenStores(maxDistance);
+
     renderStoreCount(openStores);
+
     renderStores(openStores);
-    randomResult.innerHTML = "";
-});
+}
+
+
+// ======================
+// 事件監聽
+// ======================
+
+// 隨機選一家店
+storeRandomBtn.addEventListener(
+    "click",
+    function () {
+        const maxDistance =
+            Number(distanceFilter.value);
+
+        const openStores =
+            getOpenStores(maxDistance);
+
+        if (openStores.length === 0) {
+            alert("目前沒有符合條件的營業中店家");
+            return;
+        }
+
+        const randomIndex =
+            Math.floor(
+                Math.random() *
+                openStores.length
+            );
+
+        const randomStore =
+            openStores[randomIndex];
+
+        renderRandomStore(randomStore);
+    }
+);
+
+
+// 切換距離篩選器
+distanceFilter.addEventListener(
+    "change",
+    function () {
+        updateStoreList();
+
+        randomResult.innerHTML = "";
+    }
+);
+
+
+// ======================
+// 初始化
+// ======================
+
+storeCount.textContent =
+    "正在取得你的位置...";
+
+storeList.innerHTML = `
+    <p>請稍候，正在計算附近飲料店。</p>
+`;
+
+if ("geolocation" in navigator) {
+    navigator.geolocation.getCurrentPosition(
+        showPosition,
+        showPositionError
+    );
+} else {
+    storeCount.textContent =
+        "你的瀏覽器不支援定位功能";
+
+    storeList.innerHTML = `
+        <p>請使用支援定位功能的瀏覽器。</p>
+    `;
+}
