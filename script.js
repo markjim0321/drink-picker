@@ -45,12 +45,17 @@ const storeList = document.getElementById("store-list");
 const storeRandomBtn =
     document.getElementById("store-random-btn");
 
-const randomResult =
-    document.getElementById("random-result");
+const randomResult = document.getElementById("random-result");
 
-const distanceFilter =
-    document.getElementById("distance-filter");
+const distanceFilter = document.getElementById("distance-filter");
 
+const storeListPage = document.getElementById("store-list-page");
+
+const storeDetailPage = document.getElementById("store-detail-page");
+
+const backBtn = document.getElementById("back-btn");
+
+const detailStoreName = document.getElementById("detail-store-name");
 
 // ======================
 // Functions
@@ -84,7 +89,24 @@ function renderStores(stores) {
     }
 
     storeList.innerHTML = html;
+    // 為每個店家卡片加上點擊事件 點開來可以看到店家詳細資訊
+    const storeCards = document.querySelectorAll(".store-card");
+    console.log(storeCards);
+
+    for (let i = 0; i < storeCards.length; i++) {
+    storeCards[i].addEventListener("click", function () {
+        showStoreDetail(stores[i]);
+    });
 }
+}
+
+// 關閉店家列表頁面，顯示店家詳細資訊頁面
+function showStoreDetail(store) {
+    storeListPage.style.display = "none";
+    storeDetailPage.style.display = "block";
+    detailStoreName.textContent = store.name;
+}
+
 
 
 // 顯示飲料店數量
@@ -273,6 +295,14 @@ distanceFilter.addEventListener(
     }
 );
 
+// 返回列表頁面
+backBtn.addEventListener(
+    "click", 
+    function () {
+        storeListPage.style.display = "block";
+        storeDetailPage.style.display = "none";
+    }
+);
 
 // ======================
 // 初始化

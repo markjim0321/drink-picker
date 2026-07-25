@@ -17,3 +17,7 @@
     margin-bottom: 12px;
     background-color: #f9fff9;
 }
+
+#store-detail-page {
+    display: none;
+}

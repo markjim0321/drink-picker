@@ -14,13 +14,14 @@
 
 <body>
   <main>
+  <div id="store-list-page">
     <h1>附近飲料店隨機選店助手</h1>
     <p>不知道喝哪一家？讓我幫你選。</p>
 
     <select id="distance-filter">
-        <option value="500">500 公尺內</option>
-        <option value="1000">1 公里內</option>
-        <option value="2000">2 公里內</option>
+      <option value="500">500 公尺內</option>
+      <option value="1000">1 公里內</option>
+      <option value="100000">2 公里內</option>
     </select>
 
     <button id="store-random-btn">隨機選擇</button>
@@ -29,15 +30,23 @@
 
     <div id="store-count"></div>
 
-    <div id="store-list" class="store-card">
-        
+    <div id="store-list"></div>
+  </div>
+
+  <div id="store-detail-page">
+    <button id="back-btn">← 返回店家列表</button>
+
+    <h2 id="detail-store-name">店家名稱</h2>
+
+    <div id="detail-store-info"></div>
+
+    <h3>菜單</h3>
+
+    <div id="menu-list">
+      菜單之後會顯示在這裡
     </div>
-
-    
-
-
-
-  </main>
+  </div>
+</main>
 
   <!-- 引入 JavaScript 檔案 -->
   <script src="script.js"></script>
