@@ -4,49 +4,65 @@
   <meta charset="UTF-8">
 
   <!-- 讓網頁在手機上使用正確寬度顯示 -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    
+    <meta name="theme-color" content="#FBFAF6">
+
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
   <title>附近飲料店隨機選店助手</title>
+
+  <!-- 字體 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
 
   <!-- 引入 CSS 檔案 -->
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-  <main>
-  <div id="store-list-page">
-    <h1>附近飲料店隨機選店助手</h1>
-    <p>不知道喝哪一家？讓我幫你選。</p>
+  <div class="app">
 
-    <select id="distance-filter">
-      <option value="500">500 公尺內</option>
-      <option value="1000">1 公里內</option>
-      <option value="100000">2 公里內</option>
-    </select>
+    <header class="app-header">
+      <h1 class="app-title">附近飲料店<br>隨機選店助手</h1>
+      <p class="app-subtitle"></p>
+    </header>
 
-    <button id="store-random-btn">隨機選擇</button>
+    <main>
+      <section id="store-list-page" class="page page--active">
 
-    <div id="random-result"></div>
+        <div class="distance-filter" id="distance-filter" role="group" aria-label="選擇距離範圍">
+          <button type="button" class="distance-btn is-active" data-distance="500">500 公尺內</button>
+          <button type="button" class="distance-btn" data-distance="1000">1 公里內</button>
+          <button type="button" class="distance-btn" data-distance="2000">2 公里內</button>
+        </div>
 
-    <div id="store-count"></div>
+        <button id="store-random-btn" class="random-btn">
+          <span aria-hidden="true">🎲</span> 隨機選擇
+        </button>
 
-    <div id="store-list"></div>
+        <div id="random-result"></div>
+
+        <div id="store-count" class="store-count"></div>
+
+        <div id="store-list" class="store-list"></div>
+
+      </section>
+
+      <section id="store-detail-page" class="page">
+        <button id="back-btn" class="back-btn">← 返回店家列表</button>
+
+        <h2 id="detail-store-name" class="detail-store-name">店家名稱</h2>
+
+        <div id="detail-store-info" class="detail-store-info"></div>
+      </section>
+    </main>
   </div>
-
-  <div id="store-detail-page">
-    <button id="back-btn">← 返回店家列表</button>
-
-    <h2 id="detail-store-name">店家名稱</h2>
-
-    <div id="detail-store-info"></div>
-
-    <h3>菜單</h3>
-
-    <div id="menu-list">
-      菜單之後會顯示在這裡
-    </div>
-  </div>
-</main>
 
   <!-- 引入 JavaScript 檔案 -->
   <script src="script.js"></script>
