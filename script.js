@@ -1,30 +1,53 @@
 // ======================
-// 假資料
-// ======================
-
-let drinkStores = [];
-
-// ======================
 // 取得 HTML 元素
 // ======================
 
-const storeCount = document.getElementById("store-count");
-const storeList = document.getElementById("store-list");
-const storeRandomBtn = document.getElementById("store-random-btn");
-const randomResult = document.getElementById("random-result");
-const distanceButtons = document.querySelectorAll(".distance-btn");
-const storeListPage = document.getElementById("store-list-page");
-const storeDetailPage = document.getElementById("store-detail-page");
-const backBtn = document.getElementById("back-btn");
-const detailStoreName = document.getElementById("detail-store-name");
-const detailStoreInfo = document.getElementById("detail-store-info");
+const storeCount =
+    document.getElementById("store-count");
 
-// 目前選擇的距離篩選（公尺），預設 500 公尺
+const storeList =
+    document.getElementById("store-list");
+
+const storeRandomBtn =
+    document.getElementById("store-random-btn");
+
+const randomResult =
+    document.getElementById("random-result");
+
+const distanceButtons =
+    document.querySelectorAll(".distance-btn");
+
+const storeListPage =
+    document.getElementById("store-list-page");
+
+const storeDetailPage =
+    document.getElementById("store-detail-page");
+
+const backBtn =
+    document.getElementById("back-btn");
+
+const detailStoreName =
+    document.getElementById("detail-store-name");
+
+const detailStoreInfo =
+    document.getElementById("detail-store-info");
+
+
+// 目前選擇的距離範圍，預設為 500 公尺
 let currentDistance = 500;
+
+
+// 從 localStorage 取得已收藏的品牌
+let favoriteBrands =
+    JSON.parse(
+        localStorage.getItem("favoriteBrands")
+    ) || [];
+
 
 // ======================
 // Functions
 // ======================
+
 
 // 顯示飲料店列表
 function renderStores(stores) {
@@ -54,42 +77,72 @@ function renderStores(stores) {
     }
 
     storeList.innerHTML = html;
-    // 為每個店家卡片加上點擊事件 點開來可以看到店家詳細資訊
-    const storeCards = document.querySelectorAll(".store-card");
+
+
+    // 幫每一張店家卡片加上點擊事件
+    const storeCards =
+        document.querySelectorAll(".store-card");
 
     for (let i = 0; i < storeCards.length; i++) {
-        storeCards[i].addEventListener("click", function () {
-            showStoreDetail(stores[i]);
-        });
+        storeCards[i].addEventListener(
+            "click",
+            function () {
+                showStoreDetail(stores[i]);
+            }
+        );
     }
 }
 
-// 關閉店家列表頁面，顯示店家詳細資訊頁面
+
+// 顯示店家詳細資訊
 function showStoreDetail(store) {
     storeListPage.classList.remove("page--active");
     storeDetailPage.classList.add("page--active");
 
     detailStoreName.textContent = store.name;
 
+
+    // 根據店家的 brand，尋找對應的品牌資料
+    const brand = drinkBrands.find(
+        drinkBrand =>
+            drinkBrand.name === store.brand
+    );
+
+
     let menuHtml = "";
 
-    const menu = store.menu || [];
+    // 找到品牌才顯示菜單
+    if (brand) {
+        for (let i = 0; i < brand.menu.length; i++) {
+            const item = brand.menu[i];
 
-    for (let i = 0; i < menu.length; i++) {
-        const item = menu[i];
-
-        menuHtml += `
-            <div class="menu-item">
-                <span>${item.name}</span>
-                <span>NT$ ${item.price}</span>
-            </div>
+            menuHtml += `
+                <div class="menu-item">
+                    <span>${item}</span>
+                </div>
+            `;
+        }
+    } else {
+        menuHtml = `
+            <p>目前沒有這個品牌的菜單資料。</p>
         `;
     }
 
+
     detailStoreInfo.innerHTML = `
         <p>⭐ 評分：${store.rating}</p>
-        <p>📍 距離：${formatDistance(store.distance)}</p>
-        <p>${store.isOpen ? "🟢 營業中" : "🔴 已打烊"}</p>
+
+        <p>
+            📍 距離：
+            ${formatDistance(store.distance)}
+        </p>
+
+        <p>
+            ${store.isOpen
+                ? "🟢 營業中"
+                : "🔴 已打烊"}
+        </p>
+
         <a
             href="https://www.google.com/maps/search/?api=1&query=${store.latitude},${store.longitude}"
             target="_blank"
@@ -98,50 +151,130 @@ function showStoreDetail(store) {
             🗺️ 在 Google Maps 開啟
         </a>
 
-        <h3>🧋 菜單</h3>
+        <button id="favorite-btn">
+            ♡ 收藏品牌
+        </button>
+
+        <h3>🧋 ${store.brand} 菜單</h3>
 
         ${menuHtml}
     `;
+
+
+    const favoriteBtn =
+        document.getElementById("favorite-btn");
+
+
+    let isFavorite =
+        favoriteBrands.includes(store.brand);
+
+
+    updateFavoriteButton(
+        favoriteBtn,
+        isFavorite
+    );
+
+
+    favoriteBtn.addEventListener(
+        "click",
+        function () {
+            isFavorite = !isFavorite;
+
+            if (isFavorite) {
+                // 避免同一個品牌重複加入
+                if (!favoriteBrands.includes(store.brand)) {
+                    favoriteBrands.push(store.brand);
+                }
+            } else {
+                favoriteBrands =
+                    favoriteBrands.filter(
+                        brandName =>
+                            brandName !== store.brand
+                    );
+            }
+
+            updateFavoriteButton(
+                favoriteBtn,
+                isFavorite
+            );
+
+            localStorage.setItem(
+                "favoriteBrands",
+                JSON.stringify(favoriteBrands)
+            );
+        }
+    );
 }
 
-// 顯示飲料店數量
+
+// 更新收藏按鈕文字
+function updateFavoriteButton(
+    favoriteBtn,
+    isFavorite
+) {
+    if (isFavorite) {
+        favoriteBtn.textContent =
+            "♥ 已收藏品牌";
+    } else {
+        favoriteBtn.textContent =
+            "♡ 收藏品牌";
+    }
+}
+
+
+// 顯示符合條件的店家數量
 function renderStoreCount(stores) {
     storeCount.textContent =
         `目前共有 ${stores.length} 間飲料店`;
 }
 
+
 // 取得營業中且符合距離的店家
 function getOpenStores(maxDistance) {
-    const openStores = drinkStores.filter(
-        store =>
-            store.isOpen &&
-            store.distance <= maxDistance
-    );
-
+    const openStores =
+        drinkStores.filter(
+            store =>
+                store.isOpen &&
+                store.distance <= maxDistance
+        );
+    // 依照距離由近到遠排序
     openStores.sort(
-        (a, b) => a.distance - b.distance
+        (a, b) =>
+            a.distance - b.distance
     );
 
     return openStores;
 }
 
+
 // 顯示隨機選中的店家
 function renderRandomStore(store) {
     randomResult.innerHTML = `
         <div class="random-card">
-            <div class="random-card__eyebrow">抽到了</div>
-            <div class="random-card__store">${store.name}</div>
+            <div class="random-card__eyebrow">
+                抽到了
+            </div>
+
+            <div class="random-card__store">
+                ${store.name}
+            </div>
+
             <div class="random-card__meta">
                 <span>⭐ ${store.rating}</span>
-                <span>📍 ${formatDistance(store.distance)}</span>
+
+                <span>
+                    📍 ${formatDistance(store.distance)}
+                </span>
             </div>
-         <div class="random-card__barcode"></div>
+
+            <div class="random-card__barcode"></div>
         </div>
     `;
 
+    // 點擊隨機卡片時，顯示店家詳細資訊
     const randomCard =
         document.querySelector(".random-card");
-
+    
     randomCard.addEventListener(
         "click",
         function () {
@@ -149,6 +282,7 @@ function renderRandomStore(store) {
         }
     );
 }
+
 
 // 格式化距離
 function formatDistance(distance) {
@@ -159,6 +293,7 @@ function formatDistance(distance) {
     return `${(distance / 1000).toFixed(1)} 公里`;
 }
 
+
 // 取得使用者位置成功後執行
 function showPosition(position) {
     const myLatitude =
@@ -167,82 +302,41 @@ function showPosition(position) {
     const myLongitude =
         position.coords.longitude;
 
-    // 根據使用者的位置建立附近的假店家
-    drinkStores = [
-        {
-            name: "珍珠茶坊",
-            latitude: myLatitude + 0.001,
-            longitude: myLongitude,
-            rating: 4.5,
-            isOpen: true,
 
-            menu: [
-                { name: "四季春", price: 35 },
-                { name: "珍珠奶茶", price: 65 },
-                { name: "紅茶拿鐵", price: 60 }
-            ]
-        },
-        {
-            name: "五十嵐",
-            latitude: myLatitude - 0.002,
-            longitude: myLongitude + 0.001,
-            rating: 4.2,
-            isOpen: true,
-
-            menu: [
-                { name: "四季春", price: 35 },
-                { name: "珍珠奶茶", price: 65 },
-                { name: "紅茶拿鐵", price: 60 }
-            ]
-        },
-        {
-            name: "茶湯會",
-            latitude: myLatitude,
-            longitude: myLongitude - 0.003,
-            rating: 4.0,
-            isOpen: true,
-
-            menu: [
-                { name: "觀音拿鐵", price: 65 },
-                { name: "翡翠檸檬", price: 55 },
-                { name: "珍珠紅豆拿鐵", price: 70 }
-            ]
-        },
-        {
-            name: "CoCo都可",
-            latitude: myLatitude + 0.006,
-            longitude: myLongitude,
-            rating: 4.3,
-            isOpen: true,
-
-            menu: [
-                { name: "百香雙響炮", price: 65 },
-                { name: "奶茶三兄弟", price: 70 },
-                { name: "珍珠奶茶", price: 60 }
-            ]
-        }
-    ];
-
+    // 使用定位建立假店家的實際座標
     for (let i = 0; i < drinkStores.length; i++) {
         const store = drinkStores[i];
 
-        const distance = calculateDistance(
-            myLatitude,
-            myLongitude,
-            store.latitude,
-            store.longitude
-        );
+        store.latitude =
+            myLatitude + store.latitudeOffset;
+
+        store.longitude =
+            myLongitude + store.longitudeOffset;
+
+
+        const distance =
+            calculateDistance(
+                myLatitude,
+                myLongitude,
+                store.latitude,
+                store.longitude
+            );
 
         store.distance =
             Math.round(distance);
     }
 
+
     updateStoreList();
 }
 
+
 // 取得位置失敗後執行
 function showPositionError(error) {
-    console.error("定位失敗：", error);
+    console.error(
+        "定位失敗：",
+        error
+    );
 
     storeCount.textContent =
         "無法取得你的位置";
@@ -254,6 +348,7 @@ function showPositionError(error) {
         </p>
     `;
 }
+
 
 // 計算兩個座標之間的距離
 function calculateDistance(
@@ -273,10 +368,21 @@ function calculateDistance(
         Math.PI / 180;
 
     const a =
-        Math.sin(latitudeDifference / 2) ** 2 +
-        Math.cos(myLatitude * Math.PI / 180) *
-        Math.cos(storeLatitude * Math.PI / 180) *
-        Math.sin(longitudeDifference / 2) ** 2;
+        Math.sin(
+            latitudeDifference / 2
+        ) ** 2 +
+
+        Math.cos(
+            myLatitude * Math.PI / 180
+        ) *
+
+        Math.cos(
+            storeLatitude * Math.PI / 180
+        ) *
+
+        Math.sin(
+            longitudeDifference / 2
+        ) ** 2;
 
     const c =
         2 * Math.atan2(
@@ -287,7 +393,8 @@ function calculateDistance(
     return earthRadius * c;
 }
 
-// 依照目前篩選距離更新畫面
+
+// 依照目前選擇的距離更新畫面
 function updateStoreList() {
     const openStores =
         getOpenStores(currentDistance);
@@ -297,9 +404,11 @@ function updateStoreList() {
     renderStores(openStores);
 }
 
+
 // ======================
 // 事件監聽
 // ======================
+
 
 // 隨機選一家店
 storeRandomBtn.addEventListener(
@@ -309,16 +418,19 @@ storeRandomBtn.addEventListener(
             getOpenStores(currentDistance);
 
         if (openStores.length === 0) {
-            alert("目前沒有符合條件的營業中店家");
+            alert(
+                "目前沒有符合條件的營業中店家"
+            );
+
             return;
         }
-
+        // 產生隨機索引
         const randomIndex =
             Math.floor(
                 Math.random() *
                 openStores.length
             );
-
+        // 取得隨機店家
         const randomStore =
             openStores[randomIndex];
 
@@ -326,31 +438,53 @@ storeRandomBtn.addEventListener(
     }
 );
 
-// 切換距離篩選（藥丸型按鈕）
-distanceButtons.forEach(function (btn) {
-    btn.addEventListener("click", function () {
-        distanceButtons.forEach(function (b) {
-            b.classList.remove("is-active");
-        });
 
-        btn.classList.add("is-active");
+// 切換距離篩選
+distanceButtons.forEach(
+    function (btn) {
+        btn.addEventListener(
+            "click",
+            function () {
+                distanceButtons.forEach(
+                    function (button) {
+                        button.classList.remove(
+                            "is-active"
+                        );
+                    }
+                );
 
-        currentDistance = Number(btn.dataset.distance);
+                btn.classList.add(
+                    "is-active"
+                );
 
-        updateStoreList();
+                currentDistance =
+                    Number(
+                        btn.dataset.distance
+                    );
 
-        randomResult.innerHTML = "";
-    });
-});
+                updateStoreList();
 
-// 返回列表頁面
+                randomResult.innerHTML = "";
+            }
+        );
+    }
+);
+
+
+// 返回店家列表頁面
 backBtn.addEventListener(
     "click",
     function () {
-        storeListPage.classList.add("page--active");
-        storeDetailPage.classList.remove("page--active");
+        storeListPage.classList.add(
+            "page--active"
+        );
+
+        storeDetailPage.classList.remove(
+            "page--active"
+        );
     }
 );
+
 
 // ======================
 // 初始化
@@ -362,6 +496,7 @@ storeCount.textContent =
 storeList.innerHTML = `
     <p>請稍候，正在計算附近飲料店。</p>
 `;
+
 
 if ("geolocation" in navigator) {
     navigator.geolocation.getCurrentPosition(

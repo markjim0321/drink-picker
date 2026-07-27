@@ -358,3 +358,8 @@ body {
     font-weight: 500;
     color: var(--color-ink-soft);
 }
+
+#favorite-btn {
+    display: block;
+    margin-top: 12px;
+}
