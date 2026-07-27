@@ -56,11 +56,32 @@ function renderStores(stores) {
     for (let i = 0; i < stores.length; i++) {
         const store = stores[i];
 
+        const isFavorite =
+            favoriteBrands.includes(store.brand);
+
         html += `
             <div class="store-card ${store.isOpen ? "is-open" : "is-closed"}">
+
                 <h3>${store.name}</h3>
+
                 <p>⭐ 評分：${store.rating}</p>
-                <p>📍 距離：${formatDistance(store.distance)}</p>
+
+                <div class="store-info-row">
+                    <p>
+                        📍 距離：
+                        ${formatDistance(store.distance)}
+                    </p>
+
+                    <button
+                        class="store-favorite-btn"
+                        data-brand="${store.brand}"
+                        type="button"
+                        aria-label="收藏 ${store.brand}"
+                    >
+                        ${isFavorite ? "❤️ 已收藏" : "🤍 收藏"}
+                    </button>
+                </div>
+                
                 <p>
                     ${store.isOpen
                         ? "🟢 營業中"
@@ -91,7 +112,49 @@ function renderStores(stores) {
             }
         );
     }
+
+    const favoriteButtons =
+        document.querySelectorAll(
+            ".store-favorite-btn"
+        );
+
+    for (
+        let i = 0;
+        i < favoriteButtons.length;
+        i++
+    ) {
+        favoriteButtons[i].addEventListener(
+            "click",
+            function (event) {
+                event.stopPropagation();
+
+                const brand =
+                    favoriteButtons[i].dataset.brand;
+
+                const isFavorite =
+                    favoriteBrands.includes(brand);
+
+                if (isFavorite) {
+                    favoriteBrands =
+                        favoriteBrands.filter(
+                            favoriteBrand =>
+                                favoriteBrand !== brand
+                        );
+                } else {
+                    favoriteBrands.push(brand);
+                }
+
+                localStorage.setItem(
+                    "favoriteBrands",
+                    JSON.stringify(favoriteBrands)
+                );
+
+                updateStoreList();
+            }
+        );
+    }
 }
+    
 
 
 // 顯示店家詳細資訊

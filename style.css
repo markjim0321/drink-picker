@@ -363,3 +363,28 @@ body {
     display: block;
     margin-top: 12px;
 }
+
+.store-favorite-btn:hover {
+    transform: scale(1.1);
+}
+
+.store-info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.store-info-row p {
+    margin: 0;
+}
+
+.store-favorite-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+
+    font-size: 14px;
+    color: var(--color-accent);
+
+}
