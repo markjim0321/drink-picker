@@ -8,6 +8,9 @@ const storeCount =
 const storeList =
     document.getElementById("store-list");
 
+const favoriteBrandList =
+    document.getElementById("favorite-brand-list");
+
 const storeRandomBtn =
     document.getElementById("store-random-btn");
 
@@ -81,7 +84,7 @@ function renderStores(stores) {
                         ${isFavorite ? "❤️ 已收藏" : "🤍 收藏"}
                     </button>
                 </div>
-                
+
                 <p>
                     ${store.isOpen
                         ? "🟢 營業中"
@@ -149,6 +152,7 @@ function renderStores(stores) {
                     JSON.stringify(favoriteBrands)
                 );
 
+                renderFavoriteBrands();
                 updateStoreList();
             }
         );
@@ -265,6 +269,7 @@ function showStoreDetail(store) {
                 "favoriteBrands",
                 JSON.stringify(favoriteBrands)
             );
+            renderFavoriteBrands();
         }
     );
 }
@@ -282,6 +287,64 @@ function updateFavoriteButton(
         favoriteBtn.textContent =
             "♡ 收藏品牌";
     }
+}
+
+function renderFavoriteBrands() {
+    // console.log("收藏品牌：", favoriteBrands);
+    // console.log("全部品牌：", drinkBrands);
+
+    favoriteBrandList.innerHTML = "";
+
+    const favoriteBrandData = drinkBrands.filter(
+        brand => favoriteBrands.includes(brand.name)
+    );
+
+    favoriteBrandData.forEach(brand => {
+        favoriteBrandList.innerHTML += `
+            <button
+                class="favorite-brand-item"
+                type="button"
+                data-brand="${brand.name}"
+            >
+                <img
+                    src="${brand.image}"
+                    alt="${brand.name}"
+                    class="favorite-brand-logo"
+                >
+
+                <span class="favorite-brand-name">
+                    ${brand.name}
+                </span>
+            </button>
+        `;
+    });
+
+    // 幫收藏品牌按鈕加上點擊事件
+    const favoriteBrandButtons =
+        document.querySelectorAll(".favorite-brand-item");
+
+    favoriteBrandButtons.forEach(button => {
+
+        button.addEventListener("click", function () {
+
+            const brandName =
+                button.dataset.brand;
+
+            const selectedStore = drinkStores
+                .filter(store =>
+                    store.brand === brandName
+                )
+                .sort((a, b) =>
+                    a.distance - b.distance
+                )[0];
+
+            if (selectedStore) {
+                showStoreDetail(selectedStore);
+            }
+
+        });
+
+    });
 }
 
 
@@ -574,3 +637,5 @@ if ("geolocation" in navigator) {
         <p>請使用支援定位功能的瀏覽器。</p>
     `;
 }
+
+renderFavoriteBrands();
