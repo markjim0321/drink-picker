@@ -29,24 +29,32 @@
   <div class="app">
 
     <header class="app-header">
-      <h1 class="app-title">附近飲料店<br>隨機選店助手</h1>
+      <h1 class="app-title">選飲料</h1>
       <p class="app-subtitle"></p>
     </header>
 
     <main>
       <section id="store-list-page" class="page page--active">
 
+        <!-- 距離範圍選擇按鈕 -->
         <div class="distance-filter" id="distance-filter" role="group" aria-label="選擇距離範圍">
           <button type="button" class="distance-btn is-active" data-distance="500">500 公尺內</button>
           <button type="button" class="distance-btn" data-distance="1000">1 公里內</button>
           <button type="button" class="distance-btn" data-distance="2000">2 公里內</button>
         </div>
 
+        <!-- 隨機選擇按鈕 -->
         <button id="store-random-btn" class="random-btn">
           <span aria-hidden="true">🎲</span> 隨機選擇
         </button>
 
+        <!-- 隨機選擇結果顯示區塊 -->
         <div id="random-result"></div>
+        
+        <!-- 菜單 -->
+        <section id="menu-section">
+
+        </section>
 
         <section class="favorite-brands-section">
             <h2>❤️ 我收藏的品牌</h2>
@@ -57,25 +65,53 @@
         </section>
 
         
-
+        <!-- store-count 顯示店家數量 -->
         <div id="store-count" class="store-count"></div>
 
+        <!-- store-list 顯示店家列表 -->
         <div id="store-list" class="store-list"></div>
 
       </section>
 
-      <section id="store-detail-page" class="page">
-        <button id="back-btn" class="back-btn">← 返回店家列表</button>
+        <!-- 店家詳細資訊頁面 -->
+        <section id="store-detail-page" class="page">
 
-        <h2 id="detail-store-name" class="detail-store-name">店家名稱</h2>
+            <!-- 固定在上面的店家資訊 -->
+            <div class="detail-page-sticky">
 
-        <div id="detail-store-info" class="detail-store-info"></div>
+                <div class="detail-topbar">
 
-        <!-- <button id="favorite-btn">
-            ♡ 收藏
-        </button> -->
+                    <button
+                        id="back-btn"
+                        class="detail-back-btn"
+                        type="button"
+                        aria-label="返回店家列表"
+                    >
+                        <span aria-hidden="true">←</span>
+                    </button>
 
-      </section>
+                    <h2
+                        id="detail-store-name"
+                        class="detail-store-name"
+                    >
+                        店家名稱
+                    </h2>
+
+                    <span class="detail-topbar-spacer" aria-hidden="true"></span>
+
+                </div>
+
+                <div id="detail-store-header"></div>
+
+            </div>
+
+            <!-- 可以上下捲動的菜單內容 -->
+            <div
+                id="detail-store-info"
+                class="detail-store-info"
+            ></div>
+
+        </section>
     </main>
   </div>
 
