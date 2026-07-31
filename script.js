@@ -728,7 +728,6 @@ async function initGoogleMaps() {
                     "displayName",
                     "location",
                     "rating",
-                    "regularOpeningHours",
                     "googleMapsURI"
                 ],
 
