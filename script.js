@@ -46,6 +46,8 @@ let favoriteBrands =
         localStorage.getItem("favoriteBrands")
     ) || [];
 
+let currentStores = [];
+
 
 // ======================
 // Functions
@@ -59,7 +61,11 @@ function renderStores(stores) {
     for (let i = 0; i < stores.length; i++) {
         const store = stores[i];
 
+        const hasBrandData =
+            store.brand !== "";
+
         const isFavorite =
+            hasBrandData &&
             favoriteBrands.includes(store.brand);
 
         html += `
@@ -75,14 +81,19 @@ function renderStores(stores) {
                         ${formatDistance(store.distance)}
                     </p>
 
-                    <button
-                        class="store-favorite-btn"
-                        data-brand="${store.brand}"
-                        type="button"
-                        aria-label="收藏 ${store.brand}"
-                    >
-                        ${isFavorite ? "❤️ 已收藏" : "🤍 收藏"}
-                    </button>
+                    ${hasBrandData
+                        ? `
+                            <button
+                                class="store-favorite-btn"
+                                data-brand="${store.brand}"
+                                type="button"
+                                aria-label="收藏 ${store.brand}"
+                            >
+                                ${isFavorite ? "❤️ 已收藏" : "🤍 收藏"}
+                            </button>
+                        `
+                        : ""
+                    }
                 </div>
 
                 <p>
@@ -133,6 +144,10 @@ function renderStores(stores) {
 
                 const brand =
                     favoriteButtons[i].dataset.brand;
+
+                if (!brand) {
+                    return;
+                    }
 
                 const isFavorite =
                     favoriteBrands.includes(brand);
@@ -332,7 +347,8 @@ function renderFavoriteBrands() {
 
             const selectedStore = drinkStores
                 .filter(store =>
-                    store.brand === brandName
+                    store.brand === brandName &&
+                    store.isOpen
                 )
                 .sort((a, b) =>
                     a.distance - b.distance
@@ -340,6 +356,10 @@ function renderFavoriteBrands() {
 
             if (selectedStore) {
                 showStoreDetail(selectedStore);
+            } else {
+                alert(
+                    `目前沒有營業中的 ${brandName} 店家`
+                );
             }
 
         });
@@ -358,7 +378,7 @@ function renderStoreCount(stores) {
 // 取得營業中且符合距離的店家
 function getOpenStores(maxDistance) {
     const openStores =
-        drinkStores.filter(
+        currentStores.filter(
             store =>
                 store.isOpen &&
                 store.distance <= maxDistance
@@ -639,3 +659,142 @@ if ("geolocation" in navigator) {
 }
 
 renderFavoriteBrands();
+
+function getBrandFromStoreName(storeName) {
+    const normalizedStoreName = storeName.toLowerCase();
+
+    const matchedBrand = drinkBrands.find(function (brand) {
+        return brand.keywords.some(function (keyword) {
+            return normalizedStoreName.includes(
+                keyword.toLowerCase()
+            );
+        });
+    });
+
+    if (matchedBrand) {
+        return matchedBrand.name;
+    }
+
+    return "";
+}
+
+// 距離計算函式
+function calculateDistance(
+    latitude1,
+    longitude1,
+    latitude2,
+    longitude2
+) {
+    const earthRadius = 6371000;
+
+    const latitudeDifference =
+        (latitude2 - latitude1) * Math.PI / 180;
+
+    const longitudeDifference =
+        (longitude2 - longitude1) * Math.PI / 180;
+
+    const a =
+        Math.sin(latitudeDifference / 2) ** 2 +
+        Math.cos(latitude1 * Math.PI / 180) *
+        Math.cos(latitude2 * Math.PI / 180) *
+        Math.sin(longitudeDifference / 2) ** 2;
+
+    const c =
+        2 * Math.atan2(
+            Math.sqrt(a),
+            Math.sqrt(1 - a)
+        );
+
+    return Math.round(earthRadius * c);
+}
+
+async function initGoogleMaps() {
+    console.log("Google Maps API 載入成功！");
+
+    navigator.geolocation.getCurrentPosition(
+        async function (position) {
+            console.log("定位成功！");
+
+            const userLocation = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude
+            };
+
+            const { Place, SearchNearbyRankPreference } =
+                await google.maps.importLibrary("places");
+
+            const request = {
+                fields: [
+                    "displayName",
+                    "location",
+                    "rating",
+                    "regularOpeningHours",
+                    "googleMapsURI"
+                ],
+
+                locationRestriction: {
+                    center: userLocation,
+                    radius: 1000
+                },
+
+                includedPrimaryTypes: [
+                    "tea_house"
+                ],
+
+                maxResultCount: 20,
+
+                rankPreference:
+                    SearchNearbyRankPreference.DISTANCE
+            };
+
+            const { places } =
+                await Place.searchNearby(request);
+
+            const googleStores = places.map(function (place) {
+
+            const storeLatitude =
+                place.location.lat();
+
+            const storeLongitude =
+                place.location.lng();
+
+            return {
+                name: place.displayName,
+
+                brand:
+                    getBrandFromStoreName(
+                        place.displayName
+                    ),
+
+                latitude: storeLatitude,
+
+                longitude: storeLongitude,
+
+                distance: calculateDistance(
+                    userLocation.lat,
+                    userLocation.lng,
+                    storeLatitude,
+                    storeLongitude
+                ),
+
+                rating: place.rating ?? 0,
+
+                isOpen: true,
+
+                googleMapsUrl:
+                    place.googleMapsURI
+            };
+        });
+
+            console.table(googleStores);
+
+            currentStores = googleStores;
+
+            updateStoreList();
+        },
+
+        function (error) {
+            console.log("定位失敗：", error);
+        }
+    );
+}

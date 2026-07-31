@@ -1,6 +1,7 @@
 const drinkBrands = [
     {
-        name: "CoCo",
+        name: "CoCo都可",
+        keywords: ["coco", "coco都可"],
         image: "images/brands/CoCo.png",
         menu: [
             "百香雙響炮 35元",
@@ -10,6 +11,7 @@ const drinkBrands = [
     },
     {
         name: "五十嵐",
+        keywords: ["50嵐", "五十嵐"],
         image: "images/brands/50lan.png",
         menu: [
             "波霸奶茶 30元",
@@ -18,6 +20,7 @@ const drinkBrands = [
     },
         {
         name: "五桐號",
+        keywords: ["五桐號"],
         image: "images/brands/WooTEA.png",
         menu: [
             "百香雙響炮 35元",
@@ -27,6 +30,7 @@ const drinkBrands = [
     },
     {
         name: "茶湯會",
+        keywords: ["茶湯會"],
         image: "images/brands/P-TEA.png",
         menu: [
             "百香雙響炮 35元",
