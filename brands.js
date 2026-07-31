@@ -16,7 +16,7 @@ const drinkBrands = [
             "50 Lan",
             "50lan"
         ],
-        image: "images/brands/50Lan.png",
+        image: "images/brands/50lan.png",
         menu: [
             {
                 category: "找好茶",
